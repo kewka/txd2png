@@ -1,0 +1,3 @@
+[submodule "rwtools"]
+	path = rwtools
+	url = https://github.com/Kewka/rwtools
