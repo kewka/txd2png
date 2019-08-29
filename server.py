@@ -24,6 +24,10 @@ from script import convert
 
 
 def handle_request(client: socket.socket):
+     # Create temp directory.
+    if not os.path.isdir(config.TEMP_DIR):
+        os.mkdir(config.TEMP_DIR)
+
     # Generate file id.
     id = str(uuid.uuid1())
 
@@ -35,7 +39,7 @@ def handle_request(client: socket.socket):
 
     # Set the socket timeout.
     client.settimeout(config.SOCKET_TIMEOUT_SECONDS)
-    
+
     # Create working directory.
     os.mkdir(working_dir)
 
@@ -78,14 +82,16 @@ def handle_request(client: socket.socket):
 
         if png_count:
             # Send [png_count].
-            client.send(png_count.to_bytes(config.HEADER_SIZE, config.HEADER_BYTEORDER))
+            client.send(png_count.to_bytes(
+                config.HEADER_SIZE, config.HEADER_BYTEORDER))
 
             for png_file in png_files:
                 png_path = os.path.join(working_dir, png_file + '.png')
                 png_size = os.path.getsize(png_path)
 
                 # Send [png_size].
-                client.send(png_size.to_bytes(config.HEADER_SIZE, config.HEADER_BYTEORDER))
+                client.send(png_size.to_bytes(
+                    config.HEADER_SIZE, config.HEADER_BYTEORDER))
 
                 with open(png_path, 'rb') as png:
                     # Send [png_content].
@@ -98,8 +104,8 @@ def handle_request(client: socket.socket):
                         client.send(chunk)
 
         return clean()
-    except socket.timeout:
-        print('[%s] Socket timeout error' % id)
+    except:
+        print('[%s] Socket error' % id)
         return clean()
 
 
@@ -110,7 +116,7 @@ def main():
     print('txd2png-server running on %s:%d' % config.SERVER_ADDRESS)
 
     while True:
-        client, addr = server.accept()
+        client, _ = server.accept()
         print('New client')
         threading.Thread(target=handle_request, args=(client,)).start()
 

@@ -5,16 +5,11 @@ WORKDIR /usr/src/app
 COPY . .
 
 # Build rwtools
-RUN apt-get update
-RUN apt-get install make build-essential libpng-dev -y
-RUN ./build
+RUN apt-get update \
+    && apt-get install make build-essential libpng-dev -y \
+    && ./build
 
-# Install nodejs
-RUN apt-get install -y curl
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
-RUN apt-get install -y nodejs
+# Install python 3
+RUN apt-get install -y python3-pip python3-dev
 
-# Install pm2
-RUN npm install pm2 -g
-
-CMD ["pm2-runtime", "server.py", "--interpreter=python3"]
+CMD ["python3", "server.py"]
